@@ -50,7 +50,7 @@ if ( -not (Test-Administrator) )
 	[Environment]::Exit(1)
 }
 
-<#
+
 $ComputerCompany = GetUserInputandVerify -Prompt "Enter PC Company"
 $ComputerModel = GetUserInputandVerify -Prompt "Enter PC Model"
 $BIOSVersion = GetUserInputandVerify -Prompt "Enter Full BIOS Company and Version String"
@@ -62,8 +62,9 @@ $VideoCardVersion = GetUserInputandVerify -Prompt "Enter Full Video Card Company
 $HardriveVersion = GetUserInputandVerify -Prompt "Enter Hardrive Company and Version String"
 $DVDVersion = GetUserInputandVerify -Prompt "Enter DVD Drive Company and Version String"
 $MouseVersion = GetUserInputandVerify -Prompt "Enter Full Mouse Company and Version String"
-#>
 
+
+<#
 $ComputerCompany = "Hewlett-Packard"
 $ComputerModel = "M01-F0033w"
 $BIOSVersion = "Phoenix Technologies LTD MP11.88z.005C.B09.0707251237"
@@ -72,9 +73,10 @@ $ProcessorCompany = "AMD"
 $ProcessorVersion = "AMD Ryzen 3 3100"
 $VideoCardCompany = "Intel"
 $VideoCardVersion = "Intel UHD Graphics 620"
-$HardriveVersion =  "Western Digital WD Black 128GB"
+$HardriveVersion =  "SONY SATA 128GB"
 $DVDVersion = "Liteon DVD-RW 320G"
 $MouseVersion = "Razer G690"
+#>
 
 
 if (Get-ItemProperty -Path "HKLM:\HARDWARE\Description\System" -Name "SystemBiosVersion" -ErrorAction SilentlyContinue) {
