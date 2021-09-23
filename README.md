@@ -8,4 +8,4 @@ To use the tool, download the ps1 file into the VirtualBox VM. Then, from an ele
 
 Follow the prompts to provide the spoofed hardware.  
 
-This tool can only hide so much.  It will still be possible to determine the VM is a Virtual Machine, but it will survive cursory review.  For more information, including other tools and tricks, please see <TODO Provide Link>
+This tool can only hide so much.  It will still be possible to determine the VM is a Virtual Machine, but it will survive cursory review.  For more information, including other tools and tricks, please see https://theshellster.medium.com/configuring-virtualbox-for-scambaiting-part-1-15da011adea0
