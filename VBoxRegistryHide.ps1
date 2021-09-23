@@ -1,4 +1,4 @@
-# Largely based off https://github.com/d4rksystem/VBoxCloak/blob/master/VBoxCloak.ps1
+# Partially based off https://github.com/d4rksystem/VBoxCloak/blob/master/VBoxCloak.ps1
 
 function Test-Administrator  
 {  
@@ -6,10 +6,8 @@ function Test-Administrator
     (New-Object Security.Principal.WindowsPrincipal $user).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)  
 }
 
-function get-itemproperty2 {
+function Get-ItemProperty2 {
   #https://stackoverflow.com/a/54618711/315482
-  # get-childitem skips top level key, use get-item for that
-  # set-alias gp2 get-itemproperty2
   param([parameter(ValueFromPipeline)]$key)
   process {
     $key.getvaluenames() | foreach-object {
@@ -29,15 +27,25 @@ function get-itemproperty2 {
 function GetUserInputandVerify {
 	[CmdletBinding()]
     param (
-        [string]$Prompt
+        [string]$Prompt,
+        [string]$Default
     )
     
 	$ok = "n"
+
+    if($Default.Length -gt 0){
+        $Prompt += " ($Default)"
+    }
 	
 	while($ok -ne "y")
 	{
+
 		$result = Read-Host -Prompt $Prompt
 		
+        if($result.Length -eq 0 -and $Default.Length -gt 0){
+            $result = $Default
+        }
+
 		$ok = Read-Host -Prompt "You entered: $result`nDoes this look right (y/n)"
 	}
 
@@ -50,18 +58,20 @@ if ( -not (Test-Administrator) )
 	[Environment]::Exit(1)
 }
 
+Write-Host "Please answer the follwing questions (Blank for shown default):"
 
-$ComputerCompany = GetUserInputandVerify -Prompt "Enter PC Company"
-$ComputerModel = GetUserInputandVerify -Prompt "Enter PC Model"
-$BIOSVersion = GetUserInputandVerify -Prompt "Enter Full BIOS Company and Version String"
-$BIOSDate = GetUserInputandVerify -Prompt "Enter BIOS Date (MM/DD/YY)"
-$ProcessorCompany = GetUserInputandVerify -Prompt "Enter Processor Company Name"
-$ProcessorVersion = GetUserInputandVerify -Prompt "Enter Full Processor Company and Version String"
-$VideoCardCompany = GetUserInputandVerify -Prompt "Enter Video Card Company Name"
-$VideoCardVersion = GetUserInputandVerify -Prompt "Enter Full Video Card Company and Version String"
-$HardriveVersion = GetUserInputandVerify -Prompt "Enter Hardrive Company and Version String"
-$DVDVersion = GetUserInputandVerify -Prompt "Enter DVD Drive Company and Version String"
-$MouseVersion = GetUserInputandVerify -Prompt "Enter Full Mouse Company and Version String"
+
+$ComputerCompany = GetUserInputandVerify -Prompt "Enter PC Company" -Default "Hewlett-Packard"
+$ComputerModel = GetUserInputandVerify -Prompt "Enter PC Model" -Default "M01-F0033w"
+$BIOSVersion = GetUserInputandVerify -Prompt "Enter Full BIOS Company and Version String" -Default "Phoenix Technologies LTD MP11.88z.005C.B09.0707251237"
+$BIOSDate = GetUserInputandVerify -Prompt "Enter BIOS Date (MM/DD/YY)" -Default "09/01/18"
+$ProcessorCompany = GetUserInputandVerify -Prompt "Enter Processor Company Name" -Default "AMD"
+$ProcessorVersion = GetUserInputandVerify -Prompt "Enter Full Processor Company and Version String" -Default "AMD Ryzen 3 3100"
+$VideoCardCompany = GetUserInputandVerify -Prompt "Enter Video Card Company Name" -Default "Intel"
+$VideoCardVersion = GetUserInputandVerify -Prompt "Enter Full Video Card Company and Version String" -Default "Intel UHD Graphics 620"
+$HardriveVersion = GetUserInputandVerify -Prompt "Enter Hardrive Company and Version String" -Default "SONY SATA 128GB"
+$DVDVersion = GetUserInputandVerify -Prompt "Enter DVD Drive Company and Version String" -Default "Liteon DVD-RW 320G"
+$MouseVersion = GetUserInputandVerify -Prompt "Enter Full Mouse Company and Version String" -Default "Razer G690"
 
 
 <#
@@ -101,7 +111,7 @@ if (Get-ItemProperty -Path "HKLM:\HARDWARE\Description\System" -Name "VideoBiosV
 	Set-ItemProperty -Path "HKLM:\HARDWARE\Description\System" -Name "VideoBiosVersion" -Value $VideoCardVersion
 }
 
-ls -r "HKLM:\SYSTEM\ControlSet001\Enum" -ErrorAction SilentlyContinue | get-itemproperty2 | where value -eq '{4d36e967-e325-11ce-bfc1-08002be10318}' | foreach-object {
+ls -r "HKLM:\SYSTEM\ControlSet001\Enum" -ErrorAction SilentlyContinue | Get-ItemProperty2 | where value -eq '{4d36e967-e325-11ce-bfc1-08002be10318}' | foreach-object {
 	$key = $_.Path.ToString()
 	
 	if (Get-ItemProperty -Path $key -Name "FriendlyName" -ErrorAction SilentlyContinue) {
@@ -110,7 +120,7 @@ ls -r "HKLM:\SYSTEM\ControlSet001\Enum" -ErrorAction SilentlyContinue | get-item
 	}
 }
 
-ls -r "HKLM:\SYSTEM\ControlSet001\Enum" -ErrorAction SilentlyContinue | get-itemproperty2 | where value -eq '{4d36e968-e325-11ce-bfc1-08002be10318}' | foreach-object {
+ls -r "HKLM:\SYSTEM\ControlSet001\Enum" -ErrorAction SilentlyContinue | Get-ItemProperty2 | where value -eq '{4d36e968-e325-11ce-bfc1-08002be10318}' | foreach-object {
 	$key = $_.Path.ToString()
 	
 	if (Get-ItemProperty -Path $key -Name "DeviceDesc" -ErrorAction SilentlyContinue) {
@@ -119,7 +129,7 @@ ls -r "HKLM:\SYSTEM\ControlSet001\Enum" -ErrorAction SilentlyContinue | get-item
 	}
 }
 
-ls -r "HKLM:\SYSTEM\ControlSet001\Enum" -ErrorAction SilentlyContinue | get-itemproperty2 | where value -eq '{4d36e965-e325-11ce-bfc1-08002be10318}' | foreach-object {
+ls -r "HKLM:\SYSTEM\ControlSet001\Enum" -ErrorAction SilentlyContinue | Get-ItemProperty2 | where value -eq '{4d36e965-e325-11ce-bfc1-08002be10318}' | foreach-object {
 	$key = $_.Path.ToString()
 	
 	if (Get-ItemProperty -Path $key -Name "DeviceDesc" -ErrorAction SilentlyContinue) {
@@ -133,7 +143,7 @@ ls -r "HKLM:\SYSTEM\ControlSet001\Enum" -ErrorAction SilentlyContinue | get-item
 	}
 }
 
-ls -r "HKLM:\HARDWARE\DESCRIPTION\System\CentralProcessor" -ErrorAction SilentlyContinue | get-itemproperty2 | where name -eq 'ProcessorNameString' | foreach-object {
+ls -r "HKLM:\HARDWARE\DESCRIPTION\System\CentralProcessor" -ErrorAction SilentlyContinue | Get-ItemProperty2 | where name -eq 'ProcessorNameString' | foreach-object {
 	$key = $_.Path.ToString()
 	
 	if (Get-ItemProperty -Path $key -Name "ProcessorNameString" -ErrorAction SilentlyContinue) {
@@ -142,7 +152,7 @@ ls -r "HKLM:\HARDWARE\DESCRIPTION\System\CentralProcessor" -ErrorAction Silently
 	}
 }
 
-ls -r "HKLM:\SYSTEM\ControlSet001\Enum" -ErrorAction SilentlyContinue | get-itemproperty2 | where value -eq '{50127dc3-0f36-415e-a6cc-4cb3be910b65}' | foreach-object {
+ls -r "HKLM:\SYSTEM\ControlSet001\Enum" -ErrorAction SilentlyContinue | Get-ItemProperty2 | where value -eq '{50127dc3-0f36-415e-a6cc-4cb3be910b65}' | foreach-object {
 	$key = $_.Path.ToString()
 	
 	if (Get-ItemProperty -Path $key -Name "DeviceDesc" -ErrorAction SilentlyContinue) {
@@ -156,7 +166,7 @@ ls -r "HKLM:\SYSTEM\ControlSet001\Enum" -ErrorAction SilentlyContinue | get-item
 	}
 }
 
-ls -r "HKLM:\SYSTEM\ControlSet001\Enum" -ErrorAction SilentlyContinue | get-itemproperty2 | where value -eq '{4d36e96f-e325-11ce-bfc1-08002be10318}' | foreach-object {
+ls -r "HKLM:\SYSTEM\ControlSet001\Enum" -ErrorAction SilentlyContinue | Get-ItemProperty2 | where value -eq '{4d36e96f-e325-11ce-bfc1-08002be10318}' | foreach-object {
 	$key = $_.Path.ToString()
 	
 	if (Get-ItemProperty -Path $key -Name "DeviceDesc" -ErrorAction SilentlyContinue) {
